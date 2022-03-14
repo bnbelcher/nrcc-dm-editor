@@ -3,9 +3,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-//import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
-//import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Tooltip from '@mui/material/Tooltip';
 import domtoimage from 'dom-to-image';
@@ -20,6 +18,7 @@ const DownloadMap = (props) => {
             domtoimage.toBlob(document.getElementById(node))
                 .then(function (blob) {
                     saveAs(blob, filenameToSave);
+                    console.log('end download')
                 });
         }
 

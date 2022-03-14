@@ -2,12 +2,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import React, { Component } from 'react';
-import Grid from '@mui/material/Grid';
 import axios from 'axios';
 import inside from 'point-in-polygon';
 
 import MapDroughtMonitor from './MapDroughtMonitor'
-import MapClassChange from './MapClassChange'
 
 import county_geojson from './assets/newengland_county_with_fips.json';
 import grid_geojson from './assets/newengland_grid_0.1deg.json';
@@ -44,7 +42,7 @@ class DMedit extends Component {
             mouseIsDown: false,
             mouseIsUp: true,
             mapIsEditable: false,
-            //mapValues_unchanged: null,
+            helpIsViewable: false,
             mapType: 'dmcat', //'dmcat' or 'changes'
         };
     }
@@ -101,11 +99,10 @@ class DMedit extends Component {
               }
             }
           }
-          this.handleChange_mapValues(gridValues);
-          //this.handleChange_mapValues_unchanged(gridValues);
-          // make independent copy
-          //this.mapValues_unchanged = Object.create(gridValues);
+          // make independent copy that will remain intact for comparison
           this.mapValues_unchanged = JSON.parse(JSON.stringify(gridValues));
+          // update values that users can edit
+          this.handleChange_mapValues(gridValues);
         })
         .catch(err => console.log(err))
     }
@@ -122,13 +119,6 @@ class DMedit extends Component {
         mapValues: v
       })
     }
-
-    //handleChange_mapValues_unchanged = (v) => {
-    //  // v = object containing key:value pairs of pixel:drought category
-    //  this.setState({
-    //    mapValues_unchanged: v
-    //  })
-    //}
 
     handleChange_mouseIsDown = (b) => {
       // b = boolean
@@ -150,6 +140,13 @@ class DMedit extends Component {
       let b = this.state.mapIsEditable
       this.setState({
         mapIsEditable: !b
+      })
+    }
+
+    handleChange_helpIsViewable = () => {
+      let b = this.state.helpIsViewable
+      this.setState({
+        helpIsViewable: !b
       })
     }
 
@@ -178,7 +175,7 @@ class DMedit extends Component {
       });
     }
 
-    calcClassChanges = () => {
+    updateClassChanges = () => {
       // loop through all values in mapValues, these will include all changed and unchanged pixels.
       // During this loop, we compare to values for the pixel from the unchanged DM categories.
       // Class change magnitude is returned as object in same format as mapValues.
@@ -231,47 +228,25 @@ class DMedit extends Component {
     }
 
     render() {
+
         return (
           <div id="dm-maps">
-
-            <Grid container justify="center" alignItems="center" direction="column">
-
-              {this.state.mapType==='dmcat' &&
-              <Grid item>
                 <MapDroughtMonitor
                   countyboundaries={county_geojson}
                   gridboundaries={grid_geojson}
                   category={this.state.category}
-                  categories={this.categories}
-                  values={this.state.mapValues}
+                  categories={(this.state.mapType==='dmcat') ? this.categories : this.categories_class_change}
+                  values={(this.state.mapType==='dmcat') ? this.state.mapValues : this.updateClassChanges()}
                   oneachfeature={this.onEachFeature}
                   editable={this.state.mapIsEditable}
+                  helpviewable={this.state.helpIsViewable}
                   maptype={this.state.mapType}
                   onchange_editable={this.handleChange_mapIsEditable}
+                  onchange_helpviewable={this.handleChange_helpIsViewable}
                   onchange_category={this.handleChange_category}
                   onchange_maptype={this.handleChange_mapType}
                   reset_map_values={this.initializeMapValues}
                 />
-              </Grid>
-              }
-
-              {this.state.mapType==='changes' && this.state.mapValues && this.mapValues_unchanged &&
-              <Grid item>
-                <MapClassChange
-                  countyboundaries={county_geojson}
-                  gridboundaries={grid_geojson}
-                  category={this.state.category}
-                  categories={this.categories_class_change}
-                  values={this.calcClassChanges()}
-                  editable={this.state.mapIsEditable}
-                  maptype={this.state.mapType}
-                  onchange_category={this.handleChange_category}
-                  onchange_maptype={this.handleChange_mapType}
-                />
-              </Grid>
-              }
-            </Grid>
-
           </div>
         );
     }

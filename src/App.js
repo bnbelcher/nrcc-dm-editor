@@ -2,8 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import React, { Component } from 'react';
-//import Grid from '@mui/material/Grid';
-import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 
 import DMedit from './DMedit'
 
@@ -11,9 +10,16 @@ class App extends Component {
 
     render() {
         return (
-          <Container fixed>
+          <Grid
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            style={{ minHeight: '100vh' }}
+          >
             <DMedit />
-          </Container>
+          </Grid>
         );
     }
 }

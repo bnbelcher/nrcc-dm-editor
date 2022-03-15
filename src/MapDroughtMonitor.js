@@ -31,6 +31,8 @@ import { MapContainer, GeoJSON, TileLayer, useMap } from 'react-leaflet';
 import CategorySelect from './CategorySelect'
 import DownloadMap from './DownloadMap'
 
+import nrcclogo from './assets/nrccLogoStackedT.png'
+
 class MapDroughtMonitor extends Component {
 
     constructor(props) {
@@ -94,11 +96,11 @@ class MapDroughtMonitor extends Component {
             <Button
               variant='contained'
               color='primary'
-              size={'small'}
+              size={'medium'}
               onClick={() => {this.props.maptype==='dmcat' ? this.props.onchange_maptype('changes') : this.props.onchange_maptype('dmcat')}}
             >
-              {this.props.maptype==='dmcat' ? 'Drought Monitor Editor' : 'User Changes To DM'}<br/>
-              {'(change view)'}
+              {this.props.maptype==='dmcat' ? 'Drought Monitor Editor' : 'User Changes To Drought Monitor'}<br/>
+              {this.props.maptype==='dmcat' ? '(click to view your class changes)' : '(click to return to DM Editor)'}
             </Button>
           </div>
         </div>
@@ -279,6 +281,16 @@ class MapDroughtMonitor extends Component {
       )
     }
 
+    const LogoImage = () => {
+      return (
+        <div className="leaflet-bottom leaflet-right" style={{"marginBottom":20, "marginRight":-160}}>
+          <div className="leaflet-control">
+            <img width="40%" src={nrcclogo} alt="Logo for the Northeast Regional Climate Center (NRCC)" />
+          </div>
+        </div>
+      )
+    }
+
     const CategoryLegend = () => {
       return (
           <div id='cat-legend' className="leaflet-bottom leaflet-left">
@@ -414,6 +426,8 @@ class MapDroughtMonitor extends Component {
             <CategoryLegend />
 
             <HelpDialog />
+
+            <LogoImage />
 
             {!this.props.values &&
               <Backdrop

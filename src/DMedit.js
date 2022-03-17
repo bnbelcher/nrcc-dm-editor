@@ -156,7 +156,7 @@ class DMedit extends Component {
       let valuesToEdit = this.state.mapValues
       layer.on({
         mouseover: () => {
-          if (this.state.mouseIsDown && this.state.mapIsEditable) {
+          if (this.state.mouseIsDown && this.state.mapIsEditable && this.state.mapType==='dmcat') {
             valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
             this.handleChange_mapValues(valuesToEdit);
           }
@@ -164,7 +164,7 @@ class DMedit extends Component {
         mousedown: () => {
           this.handleChange_mouseIsDown(true);
           // the following conditional handles the feature already moused over
-          if (this.state.mapIsEditable) {
+          if (this.state.mapIsEditable && this.state.mapType==='dmcat') {
             valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
             this.handleChange_mapValues(valuesToEdit);
           }

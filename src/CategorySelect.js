@@ -65,7 +65,7 @@ const CategorySelect = (props) => {
 CategorySelect.propTypes = {
   selected: PropTypes.string.isRequired,
   categories: PropTypes.array.isRequired,
-  onchange: PropTypes.func.isRequired,
+  onchange: PropTypes.func,
   editable: PropTypes.bool.isRequired,
   maptype: PropTypes.string.isRequired,
 };

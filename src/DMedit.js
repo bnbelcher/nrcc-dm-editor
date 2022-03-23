@@ -6,6 +6,10 @@ import axios from 'axios';
 import inside from 'point-in-polygon';
 
 import MapDroughtMonitor from './MapDroughtMonitor'
+import HelpDialogContent from './HelpDialogContent'
+import DownloadFileForm from './DownloadFileForm'
+import UploadFileDialogContent from './UploadFileDialogContent'
+import {MyDialog, MyDialogTitle} from './CustomDialog'
 
 import county_geojson from './assets/newengland_county_with_fips.json';
 import grid_geojson from './assets/newengland_grid_0.1deg.json';
@@ -36,24 +40,38 @@ class DMedit extends Component {
           {'number':-5, 'value':'-5','color':'#003e76'},
         ];
         this.mapValues_unchanged = null;
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.state = {
+            width: window.innerWidth,
+            height: window.innerHeight,
             mapValues: null,
             category: 'D0',
             mouseIsDown: false,
             mouseIsUp: true,
             mapIsEditable: false,
             helpIsViewable: false,
+            uploadFormIsViewable: false,
+            downloadFormIsViewable: false,
             mapType: 'dmcat', //'dmcat' or 'changes'
         };
     }
 
     componentDidMount() {
+      this.updateWindowDimensions();
+      window.addEventListener('resize', this.updateWindowDimensions);
       this.initializeMapValues()
+    }
+
+    componentWillUnmount() {
+      window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions() {
+      this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
     initializeMapValues = () => {
       this.handleChange_mapValues(null)
-      //this.handleChange_mapValues_unchanged(null)
       this.create_dmCurrent()
     }
 
@@ -150,6 +168,20 @@ class DMedit extends Component {
       })
     }
 
+    handleChange_uploadFormIsViewable = () => {
+      let b = this.state.uploadFormIsViewable
+      this.setState({
+        uploadFormIsViewable: !b
+      })
+    }
+
+    handleChange_downloadFormIsViewable = () => {
+      let b = this.state.downloadFormIsViewable
+      this.setState({
+        downloadFormIsViewable: !b
+      })
+    }
+
     // action when features on a map are clicked.
     // in this case, update the drought category for pixel
     onEachFeature = (feature,layer) => {
@@ -232,6 +264,8 @@ class DMedit extends Component {
         return (
           <div id="dm-maps">
                 <MapDroughtMonitor
+                  width={this.state.width}
+                  height={this.state.height}
                   countyboundaries={county_geojson}
                   gridboundaries={grid_geojson}
                   category={this.state.category}
@@ -240,13 +274,52 @@ class DMedit extends Component {
                   oneachfeature={this.onEachFeature}
                   editable={this.state.mapIsEditable}
                   helpviewable={this.state.helpIsViewable}
+                  uploadformviewable={this.state.uploadFormIsViewable}
+                  downloadformviewable={this.state.downloadFormIsViewable}
                   maptype={this.state.mapType}
                   onchange_editable={this.handleChange_mapIsEditable}
                   onchange_helpviewable={this.handleChange_helpIsViewable}
+                  onchange_uploadformviewable={this.handleChange_uploadFormIsViewable}
+                  onchange_downloadformviewable={this.handleChange_downloadFormIsViewable}
                   onchange_category={this.handleChange_category}
                   onchange_maptype={this.handleChange_mapType}
+                  onchange_mapvalues={this.handleChange_mapValues}
                   reset_map_values={this.initializeMapValues}
                 />
+
+                <MyDialog
+                  open={this.state.helpIsViewable}
+                  handleClose={this.handleChange_helpIsViewable}
+                  title={<MyDialogTitle title={'INSTRUCTIONS'} onClick={this.handleChange_helpIsViewable} />}
+                   children={<HelpDialogContent />}
+                />
+
+                <MyDialog
+                  open={this.state.downloadFormIsViewable}
+                  handleClose={this.handleChange_downloadFormIsViewable}
+                  title={<MyDialogTitle title={'DOWNLOAD OPTIONS'} onClick={this.handleChange_downloadFormIsViewable} />}
+                  children={
+                    <DownloadFileForm
+                      values={this.state.mapValues}
+                      maptype={this.state.mapType}
+                      onchange_downloadformviewable={this.handleChange_downloadFormIsViewable}
+                      onchange_maptype={this.handleChange_mapType}
+                    />
+                  }
+                />
+
+                <MyDialog
+                  open={this.state.uploadFormIsViewable}
+                  handleClose={this.handleChange_uploadFormIsViewable}
+                  title={<MyDialogTitle title={'UPLOAD SAVED DATA'} onClick={this.handleChange_uploadFormIsViewable} />}
+                  children={
+                    <UploadFileDialogContent
+                      onchange_mapvalues={this.handleChange_mapValues}
+                      onchange_uploadformviewable={this.handleChange_uploadFormIsViewable}
+                    />
+                  }
+                />
+
           </div>
         );
     }

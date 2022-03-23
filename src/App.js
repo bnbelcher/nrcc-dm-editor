@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import Grid from '@mui/material/Grid';
 
+import Banner from './Banner'
 import DMedit from './DMedit'
 
 class App extends Component {
@@ -15,10 +16,13 @@ class App extends Component {
             spacing={0}
             direction="column"
             alignItems="center"
-            justifyContent="center"
+            justifyContent="flex-start"
             style={{ minHeight: '100vh' }}
           >
-            <DMedit />
+            <Grid item>
+              <Banner/><br/>
+              <DMedit/>
+            </Grid>
           </Grid>
         );
     }

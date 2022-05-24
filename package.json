@@ -1,6 +1,6 @@
 {
   "name": "nrcc-dm-editor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://dm-editor.nrcc.cornell.edu",
   "//": "https://bnbelcher.github.io/nrcc-dm-editor",
   "private": true,

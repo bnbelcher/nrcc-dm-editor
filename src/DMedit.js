@@ -185,20 +185,22 @@ class DMedit extends Component {
     // action when features on a map are clicked.
     // in this case, update the drought category for pixel
     onEachFeature = (feature,layer) => {
-      let valuesToEdit = this.state.mapValues
+      //let valuesToEdit = this.state.mapValues
       layer.on({
         mouseover: () => {
           if (this.state.mouseIsDown && this.state.mapIsEditable && this.state.mapType==='dmcat') {
-            valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
-            this.handleChange_mapValues(valuesToEdit);
+            //valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
+            //this.handleChange_mapValues(valuesToEdit);
+            this.handleChange_mapValues({...this.state.mapValues, 'drought_cat':{...this.state.mapValues.drought_cat, [feature.properties.id]: this.state.category}});
           }
         },
         mousedown: () => {
           this.handleChange_mouseIsDown(true);
           // the following conditional handles the feature already moused over
           if (this.state.mapIsEditable && this.state.mapType==='dmcat') {
-            valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
-            this.handleChange_mapValues(valuesToEdit);
+            //valuesToEdit['drought_cat'][feature.properties.id] = this.state.category;
+            //this.handleChange_mapValues(valuesToEdit);
+            this.handleChange_mapValues({...this.state.mapValues, 'drought_cat':{...this.state.mapValues.drought_cat, [feature.properties.id]: this.state.category}});
           }
         },
         mouseup: () => {

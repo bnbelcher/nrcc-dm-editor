@@ -1,8 +1,8 @@
 {
   "name": "nrcc-dm-editor",
-  "version": "0.3.0",
-  "homepage": "https://dm-editor.nrcc.cornell.edu",
-  "//": "https://bnbelcher.github.io/nrcc-dm-editor",
+  "version": "0.5.0",
+  "homepage": "https://nrcc-cornell.github.io/nrcc-dm-editor",
+  "//": "https://dm-editor.nrcc.cornell.edu",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.8.2",

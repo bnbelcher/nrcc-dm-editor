@@ -24,9 +24,9 @@ class DownloadFileForm extends Component {
             downloadActive: false,
         }
         this.todayDate = new Date().toISOString().slice(0, 10);
-        this.filenameMapMain = 'dm-editor-main-'+this.todayDate+'.png'
-        this.filenameMapChange = 'dm-editor-changes-'+this.todayDate+'.png'
-        this.filenameSave = 'dm-editor-save-'+this.todayDate+'.json'
+        this.filenameMapMain = 'dm-editor-main-'+props.region+'-'+this.todayDate+'.png'
+        this.filenameMapChange = 'dm-editor-changes-'+props.region+'-'+this.todayDate+'.png'
+        this.filenameSave = 'dm-editor-save-'+props.region+'-'+this.todayDate+'.json'
     }
 
     componentDidUpdate(prevProps,prevState){
@@ -201,6 +201,7 @@ class DownloadFileForm extends Component {
 DownloadFileForm.propTypes = {
   values: PropTypes.object,
   maptype: PropTypes.string.isRequired,
+  region: PropTypes.string.isRequired,
   onchange_downloadformviewable: PropTypes.func.isRequired,
   onchange_maptype: PropTypes.func.isRequired,
 };

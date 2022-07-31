@@ -40,7 +40,7 @@ const UploadFileDialogContent = (props) => {
         <div>
             <Typography gutterBottom>
               Previously saved data files will have filenames similar to:<br/><br/>
-              <b>dm-editor-save</b>-YYYY-MM-DD<b>.json</b> (file saved on date YYYY-MM-DD)<br/><br/>
+              <b>dm-editor-save-</b><i>region-YYYY-MM-DD</i><b>.json</b><br/>(file saved on date <i>YYYY-MM-DD</i> for <i>region</i>)<br/><br/>
               NOTE: Class changes will reflect differences between this restored data and the <i>currently issued</i> drought monitor.<br/><br/>
             </Typography>
             <ImportFromFileBodyComponent/>

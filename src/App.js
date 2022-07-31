@@ -13,14 +13,15 @@ class App extends Component {
         return (
           <Grid
             container
-            spacing={0}
+            spacing={2}
             direction="column"
             alignItems="center"
             justifyContent="flex-start"
             style={{ minHeight: '100vh' }}
           >
             <Grid item>
-              <Banner/><br/>
+              <Banner/>
+              <br/>
               <DMedit/>
             </Grid>
           </Grid>

@@ -2,7 +2,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 import React from 'react';
-//import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -70,8 +69,5 @@ const HelpDialogContent = (props) => {
       )
 
 }
-
-//HelpDialogContent.propTypes = {
-//};
 
 export default HelpDialogContent;

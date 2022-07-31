@@ -16,11 +16,6 @@ theme.typography.h2 = {
 };
 
 export default class Banner extends Component {
-  constructor () {
-    super()
-    //this.nidisLogo = "img/nidisLogoT.png"
-    //this.nrccLogo = "img/nrccLogoStackedT.png"
-  }
 
   render() {
     return (

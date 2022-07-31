@@ -1,28 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-//import React, { Component } from 'react';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import Grid from '@mui/material/Grid';
-//import List from '@mui/material/List';
-//import ListItem from '@mui/material/ListItem';
 import Button from '@mui/material/Button';
 import HelpIcon from '@mui/icons-material/Help';
 import EditIcon from '@mui/icons-material/Edit';
 import UndoIcon from '@mui/icons-material/Undo';
-//import IconButton from '@mui/material/IconButton';
-//import CloseIcon from '@mui/icons-material/Close';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
-//import Dialog from '@mui/material/Dialog';
-//import DialogTitle from '@mui/material/DialogTitle';
-//import DialogContent from '@mui/material/DialogContent';
-//import Typography from '@mui/material/Typography';
+
 
 import MuiToggleButton from "@mui/material/ToggleButton";
 import { styled } from "@mui/material/styles";
@@ -30,15 +22,14 @@ import { styled } from "@mui/material/styles";
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, GeoJSON, TileLayer, useMap } from 'react-leaflet';
 
+import RegionSelect from './RegionSelect'
 import CategorySelect from './CategorySelect'
-//import DownloadFileForm from './DownloadFileForm'
 
 import nrcclogo from './assets/nrccLogoStackedT.png'
 
 const mapContainer = 'map-container';
 const mapRef = React.createRef();
-const maxBounds = [ [40.0, -80.0], [48.0, -66.0] ];
-//const zoomLevel = 6;
+const zoomLevel = 6;
 const minZoomLevel = 5;
 const maxZoomLevel = 9;
 
@@ -63,6 +54,21 @@ const MapDroughtMonitor = (props) => {
         backgroundColor: "transparent"
       },
     });
+
+    const RegionSelectMenu = () => {
+      return (
+        <div className="leaflet-top leaflet-left" style={{"marginLeft":80}}>
+          <div className="leaflet-control">
+            <RegionSelect
+              value={props.region}
+              values={props.regionList}
+              valuelabels={props.regions}
+              onchange={props.onchange_region}
+            />
+          </div>
+        </div>
+      )
+    }
 
     const MapTypeButton = () => {
       return (
@@ -259,7 +265,6 @@ const MapDroughtMonitor = (props) => {
       return {
         weight: 1,
         opacity: 0.8,
-        //color: '#000000',
         color: null,
         dashArray: '1',
         fillColor: getFeatureColor(findValueForFips(feature.properties.id)),
@@ -284,24 +289,31 @@ const MapDroughtMonitor = (props) => {
       return null;
     }
 
+    const ChangeCenter = () => {
+      const map = useMap();
+      let coords = [(props.maxbounds[0][0]+props.maxbounds[1][0])/2.,(props.maxbounds[0][1]+props.maxbounds[1][1])/2.]
+      map.setView(coords, zoomLevel);
+      return null;
+    }
+
     const CalculateMapHeight = () => {
-      if (props.height<650) {
+      if (props.height<750) {
         return 600
-      } else if (props.height>=650 && props.height<940) {
+      } else if (props.height>=750 && props.height<1175) {
         return props.height*0.90
-      } else if (props.height>=940) {
-        return 850
+      } else if (props.height>=1175) {
+        return 940
       } else {
         return 600
       }
     }
 
     const CalculateMapWidth = () => {
-      if (props.height<650) {
+      if (props.width<750) {
         return 750
-      } else if (props.height>=650 && props.height<940) {
-        return props.height*1.25
-      } else if (props.height>=940) {
+      } else if (props.width>=750 && props.width<1175) {
+        return props.width*0.98
+      } else if (props.width>=1175) {
         return 1175
       } else {
         return 750
@@ -312,7 +324,8 @@ const MapDroughtMonitor = (props) => {
       <div className="drought-map" id="drought-map">
         <MapContainer
             whenCreated={ mapInstance => { mapRef.current = mapInstance } }
-            bounds={maxBounds}
+            center={[(props.maxbounds[0][0]+props.maxbounds[1][0])/2.,(props.maxbounds[0][1]+props.maxbounds[1][1])/2.]}
+            zoom={zoomLevel}
             minZoom={minZoomLevel}
             maxZoom={maxZoomLevel}
             zoomControl={true}
@@ -324,7 +337,12 @@ const MapDroughtMonitor = (props) => {
               width:CalculateMapWidth(),
             }}
         >
+            {!props.values &&
+              <ChangeCenter />
+            }
+
             <ChangeDragging />
+
             <TileLayer
                 attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -349,6 +367,8 @@ const MapDroughtMonitor = (props) => {
 
             <MapTypeButton />
 
+            <RegionSelectMenu />
+
             <CategoryLegend />
 
             <LogoImage />
@@ -372,8 +392,9 @@ const MapDroughtMonitor = (props) => {
 MapDroughtMonitor.propTypes = {
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  countyboundaries: PropTypes.object.isRequired,
-  gridboundaries: PropTypes.object.isRequired,
+  countyboundaries: PropTypes.object,
+  gridboundaries: PropTypes.object,
+  maxbounds: PropTypes.array.isRequired,
   category: PropTypes.string.isRequired,
   categories: PropTypes.array.isRequired,
   values: PropTypes.object,
@@ -383,6 +404,10 @@ MapDroughtMonitor.propTypes = {
   uploadformviewable: PropTypes.bool.isRequired,
   downloadformviewable: PropTypes.bool.isRequired,
   maptype: PropTypes.string.isRequired,
+  region: PropTypes.string.isRequired,
+  regionList: PropTypes.array.isRequired,
+  regions: PropTypes.object.isRequired,
+  onchange_region: PropTypes.func,
   onchange_editable: PropTypes.func,
   onchange_helpviewable: PropTypes.func,
   onchange_uploadformviewable: PropTypes.func,

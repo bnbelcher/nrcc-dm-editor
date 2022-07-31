@@ -11,9 +11,6 @@ import DownloadFileForm from './DownloadFileForm'
 import UploadFileDialogContent from './UploadFileDialogContent'
 import {MyDialog, MyDialogTitle} from './CustomDialog'
 
-import county_geojson from './assets/newengland_county_with_fips.json';
-import grid_geojson from './assets/newengland_grid_0.1deg.json';
-
 class DMedit extends Component {
 
     constructor(props) {
@@ -53,6 +50,10 @@ class DMedit extends Component {
             uploadFormIsViewable: false,
             downloadFormIsViewable: false,
             mapType: 'dmcat', //'dmcat' or 'changes'
+            region: 'neweng',
+            regions: null,
+            countyGeojson: null,
+            gridGeojson: null,
         };
     }
 
@@ -60,6 +61,23 @@ class DMedit extends Component {
       this.updateWindowDimensions();
       window.addEventListener('resize', this.updateWindowDimensions);
       this.initializeMapValues()
+      this.getRegions();
+      this.getCountyGeojson();
+      this.getGridGeojson();
+    }
+
+    componentDidUpdate(prevProps,prevState) {
+        if (prevState.region!==this.state.region) {
+          this.initializeMapValues();
+        }
+        if (!this.state.countyGeojson && prevState.countyGeojson!==this.state.countyGeojson) {
+          this.getCountyGeojson();
+          this.getGridGeojson();
+        }
+        //if (prevState.countyGeojson!==this.state.countyGeojson && !prevState.countyGeojson) {
+        if (prevState.gridGeojson!==this.state.gridGeojson && !prevState.gridGeojson) {
+          setTimeout(() => this.create_dmCurrent(), 1000);
+        }
     }
 
     componentWillUnmount() {
@@ -71,8 +89,13 @@ class DMedit extends Component {
     }
 
     initializeMapValues = () => {
-      this.handleChange_mapValues(null)
-      this.create_dmCurrent()
+      this.setState({
+        mapValues: null,
+        category: 'D0',
+        mapType: 'dmcat',
+        countyGeojson: null,
+        gridGeojson: null,
+      })
     }
 
     handleChange_category = (e) => {
@@ -81,10 +104,65 @@ class DMedit extends Component {
       })
     }
 
+    handleChange_region = (e) => {
+      let v = e.target.value
+      this.setState({
+        region: v
+      })
+    }
+
+    handleChange_regions = (v) => {
+      this.setState({
+        regions: v
+      })
+    }
+
+    handleChange_countyGeojson = (v) => {
+      this.setState({
+        countyGeojson: v
+      })
+    }
+
+    handleChange_gridGeojson = (v) => {
+      this.setState({
+        gridGeojson: v
+      })
+    }
+
     getDataFromURL = (url) => {
       return axios(url).then(response => {
         return response.data
       });
+    }
+
+    getRegions = () => {
+      // download county geojson for selected region
+      let url = process.env.PUBLIC_URL + '/data/regions_info.json'
+      this.getDataFromURL(url)
+        .then(data => {
+          this.handleChange_regions(data);
+        })
+        .catch(err => console.log(err))
+    }
+
+    getGridGeojson = () => {
+      // download grid geojson for selected region
+      let url = process.env.PUBLIC_URL + '/data/'+this.state.region+'_grid_0.1deg.json'
+      this.getDataFromURL(url)
+        .then(data => {
+          this.handleChange_gridGeojson(data);
+        })
+        .catch(err => console.log(err))
+    }
+
+    getCountyGeojson = () => {
+      // download county geojson for selected region
+      let url = process.env.PUBLIC_URL + '/data/'+this.state.region+'_county_with_fips.json'
+      this.getDataFromURL(url)
+        .then(data => {
+          this.handleChange_countyGeojson(data);
+        })
+        .catch(err => console.log(err))
     }
 
     create_dmCurrent = () => {
@@ -98,9 +176,8 @@ class DMedit extends Component {
           gridValues['drought_cat'] = {}
           // loop through each pixel of the grid, finding if pixel is within a USDM polygon.
           // If so, categorize that pixel appropriately by assigning category.
-          //let pixel_id, pixel_coords, pixel_center, usdmcat, inPolygon
           let pixel_id, pixel_coords, usdmcat, inPolygon
-          for (var feature of grid_geojson['features']) {
+          for (var feature of this.state.gridGeojson['features']) {
             pixel_id = feature['properties']['id']
             pixel_coords = feature['geometry']['coordinates'][0][0]
             //pixel_center = [(pixel_coords[0][0]+pixel_coords[2][0])/2.,(pixel_coords[0][1]+pixel_coords[1][1])/2.]
@@ -263,13 +340,15 @@ class DMedit extends Component {
 
     render() {
 
+      if (this.state.regions) {
         return (
           <div id="dm-maps">
                 <MapDroughtMonitor
                   width={this.state.width}
                   height={this.state.height}
-                  countyboundaries={county_geojson}
-                  gridboundaries={grid_geojson}
+                  countyboundaries={this.state.countyGeojson}
+                  gridboundaries={this.state.gridGeojson}
+                  maxbounds={this.state.regions[this.state.region]['maxbounds']}
                   category={this.state.category}
                   categories={(this.state.mapType==='dmcat') ? this.categories : this.categories_class_change}
                   values={(this.state.mapType==='dmcat') ? this.state.mapValues : this.updateClassChanges()}
@@ -279,6 +358,10 @@ class DMedit extends Component {
                   uploadformviewable={this.state.uploadFormIsViewable}
                   downloadformviewable={this.state.downloadFormIsViewable}
                   maptype={this.state.mapType}
+                  region={this.state.region}
+                  regionList={Object.keys(this.state.regions)}
+                  regions={this.state.regions}
+                  onchange_region={this.handleChange_region}
                   onchange_editable={this.handleChange_mapIsEditable}
                   onchange_helpviewable={this.handleChange_helpIsViewable}
                   onchange_uploadformviewable={this.handleChange_uploadFormIsViewable}
@@ -304,6 +387,7 @@ class DMedit extends Component {
                     <DownloadFileForm
                       values={this.state.mapValues}
                       maptype={this.state.mapType}
+                      region={this.state.region}
                       onchange_downloadformviewable={this.handleChange_downloadFormIsViewable}
                       onchange_maptype={this.handleChange_mapType}
                     />
@@ -324,6 +408,9 @@ class DMedit extends Component {
 
           </div>
         );
+      } else {
+        return (null);
+      }
     }
 }
 

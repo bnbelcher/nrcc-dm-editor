@@ -1,10 +1,1 @@
-{
-  "neweng":{
-    "label":"New York and New England",
-    "maxbounds":[[40.0,-80.0],[48.0,-66.0]]
-  },
-  "midatl":{
-     "label":"Mid-Atlantic",
-     "maxbounds":[[37.0,-83.0],[43.0,-72.0]]
-  }
-}
+{"neweng": {"maxbounds": [[40.0, -80.0], [48.0, -66.0]], "label": "New York and New England"}, "midatl": {"maxbounds": [[37.0, -83.0], [43.0, -72.0]], "label": "Mid-Atlantic"}}
